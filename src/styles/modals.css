@@ -1,0 +1,251 @@
+/* Modal Styles - 模态框样式 */
+
+/* 模态框容器 */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 8px;
+  width: 500px;
+  max-width: 90%;
+  max-height: 90vh;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dark-theme .modal-content {
+  background-color: #252526;
+  color: var(--dark-text);
+}
+
+.modal-header {
+  padding: 15px 20px;
+  background-color: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dark-theme .modal-header {
+  background-color: #2d2d2d;
+  border-bottom-color: var(--dark-border);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.dark-theme .modal-title {
+  color: var(--dark-text);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #777;
+}
+
+.dark-theme .modal-close {
+  color: #aaa;
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.dark-theme .modal-body {
+  background-color: #1e1e1e;
+}
+
+.modal-footer {
+  padding: 15px 20px;
+  background-color: var(--header-bg);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.dark-theme .modal-footer {
+  background-color: #2d2d2d;
+  border-top-color: var(--dark-border);
+}
+
+/* 表单样式 */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.dark-theme .form-label {
+  color: var(--dark-text);
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: white;
+}
+
+.dark-theme .form-input {
+  background-color: #333;
+  border-color: #444;
+  color: var(--dark-text);
+}
+
+.form-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: white;
+}
+
+.dark-theme .form-select {
+  background-color: #333;
+  border-color: #444;
+  color: var(--dark-text);
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 16px;
+  min-height: 150px;
+  resize: vertical;
+  background-color: white;
+}
+
+.dark-theme .form-textarea {
+  background-color: #333;
+  border-color: #444;
+  color: var(--dark-text);
+}
+
+.form-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #666;
+}
+
+/* 标签切换 */
+.tab-container {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 15px;
+}
+
+.dark-theme .tab-container {
+  border-bottom-color: var(--dark-border);
+}
+
+.tab {
+  padding: 10px 15px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.tab.active {
+  border-bottom-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.dark-theme .tab.active {
+  color: var(--primary-color);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* 图床配置样式 */
+.image-host-item {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+  position: relative;
+  background-color: var(--editor-bg);
+}
+
+.dark-theme .image-host-item {
+  background-color: #333;
+}
+
+.default-image-host-select {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.default-image-host-select label {
+  font-weight: 500;
+  color: var(--primary-color);
+}
+
+.dark-theme .image-host-type {
+  background-color: #333;
+}
+
+.github-config,
+.gitee-config,
+.custom-config {
+  margin-top: 15px;
+}
+
+/* 导入预览 */
+#importPreview {
+  display: none;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 15px;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.dark-theme #importPreview {
+  border-color: #444;
+}
+
+#importPreview h4 {
+  margin-bottom: 10px;
+}
+
+#importPreview .error {
+  color: var(--error-color);
+}

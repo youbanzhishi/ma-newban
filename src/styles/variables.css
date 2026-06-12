@@ -1,0 +1,27 @@
+/* CSS Variables - CSS变量定义 */
+:root {
+  /* 主题颜色 */
+  --primary-color: #3498db;
+  --secondary-color: #2980b9;
+  --success-color: #2ecc71;
+  --error-color: #e74c3c;
+  
+  /* 侧边栏 */
+  --sidebar-bg: #2c3e50;
+  --sidebar-hover: #34495e;
+  
+  /* 头部 */
+  --header-bg: #f8f9fa;
+  
+  /* 边框和阴影 */
+  --border-color: #e0e0e0;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+  /* 编辑器 */
+  --editor-bg: #ffffff;
+  
+  /* 暗色主题 */
+  --dark-bg: #1e1e1e;
+  --dark-text: #f0f0f0;
+  --dark-border: #444;
+}

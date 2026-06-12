@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="referrer" content="never">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown编辑器</title>
+  
+  <!-- CDN依赖 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.0/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+</head>
+
+<body>
+  <!-- 登录页面 -->
+  <div id="login-container">
+    <div class="login-logo">
+      <i class="fas fa-lock"></i>
+    </div>
+    <h2 class="login-title">保险箱登录</h2>
+    <p class="login-subtitle">请输入密码访问您的文档</p>
+    <div class="form-group">
+      <label class="form-label">密码</label>
+      <input type="password" id="passwordInput" class="form-input" placeholder="输入密码">
+    </div>
+    <button class="login-btn" id="loginBtn">登录</button>
+    <div class="login-error" id="loginError">密码错误，请重试</div>
+  </div>
+
+  <!-- 顶部菜单栏 -->
+  <header class="header" id="header" style="display: none;">
+    <div class="logo">
+      <i class="fas fa-file-alt" id="logo"></i>
+      <h1>Markdown</h1>
+    </div>
+    <div class="menu-bar">
+      <div class="menu-item" id="viewMenu">
+        <i class="fas fa-eye"></i>
+        <span>视图</span>
+      </div>
+      <div class="menu-item" id="prefMenu">
+        <i class="fas fa-cog"></i>
+        <span>偏好设置</span>
+      </div>
+      <div class="menu-item" id="historyMenu">
+        <i class="fas fa-history"></i>
+        <span>历史版本</span>
+      </div>
+      <div class="menu-item" id="storageMenu">
+        <i class="fas fa-database"></i>
+        <span>存储设置</span>
+      </div>
+      <div class="menu-item" id="dataMenu">
+        <i class="fas fa-file-import"></i>
+        <span>导入/导出</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区域 -->
+  <div class="main-container" id="main-container" style="display: none;">
+    <!-- 左侧文件列表 -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">文件列表</div>
+        <button class="toggle-btn" id="sidebarToggle">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+      <div class="file-list" id="fileList"></div>
+      <button class="add-file-btn" id="addFileBtn">
+        <i class="fas fa-plus-circle"></i>
+        <span>新建文件</span>
+      </button>
+      <button class="add-folder-btn" id="addFolderBtn">
+        <i class="fas fa-folder-plus"></i>
+        <span>新建文件夹</span>
+      </button>
+    </div>
+
+    <!-- 编辑区域 -->
+    <div class="editor-container" id="editor-container">
+      <div class="editor-header">
+        <div class="editor-title" id="editorTitle">未命名.md</div>
+        <div class="editor-actions">
+          <button class="editor-btn" id="insertBtn">
+            <i class="fas fa-plus"></i>
+            <span>插入</span>
+          </button>
+          <button class="editor-btn" id="syncBtn">
+            <i class="fas fa-sync-alt"></i>
+            <span>同步</span>
+          </button>
+        </div>
+      </div>
+      <div class="editor-content">
+        <div class="editor-mode active" id="editMode">
+          <textarea id="editor" placeholder="开始输入Markdown内容..."></textarea>
+        </div>
+        <div class="editor-mode" id="previewMode">
+          <div id="preview"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 状态栏 -->
+  <div class="status-bar" id="status-bar" style="display: none;">
+    <div class="word-count">字数: <span id="wordCount">0</span></div>
+    <div id="storageStatus">存储方式: <span id="storageType">本地存储</span></div>
+    <div class="sync-status" id="syncStatus">
+      <i class="fas fa-circle"></i> <span>未同步</span>
+    </div>
+  </div>
+
+  <!-- 视图设置模态框 -->
+  <div class="modal" id="viewModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">视图设置</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">编辑模式</label>
+          <div>
+            <input type="radio" id="editOnly" name="viewMode" value="edit" checked>
+            <label for="editOnly">仅编辑</label>
+          </div>
+          <div>
+            <input type="radio" id="previewOnly" name="viewMode" value="preview">
+            <label for="previewOnly">仅预览</label>
+          </div>
+          <div>
+            <input type="radio" id="splitView" name="viewMode" value="split">
+            <label for="splitView">分屏显示</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="editor-btn secondary" id="cancelView">取消</button>
+        <button class="editor-btn" id="saveView">保存设置</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新建文件模态框 -->
+  <div class="modal" id="newFileModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>新建文件</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>文件名</label>
+          <input type="text" id="fileNameInput" class="form-input" placeholder="输入文件名">
+        </div>
+        <div class="form-group">
+          <label>文件夹</label>
+          <select id="folderSelect" class="form-select">
+            <option value="">未分类</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>模板</label>
+          <select id="templateSelect" class="form-select">
+            <option value="">无模板</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="editor-btn secondary" id="cancelNewFile">取消</button>
+        <button class="editor-btn" id="confirmNewFile">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 文件编辑模态框 -->
+  <div class="modal" id="editFileModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>编辑文件</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>文件名</label>
+          <input type="text" id="editFileName" class="form-input">
+        </div>
+        <div class="form-group">
+          <label>文件夹</label>
+          <select id="editFolderSelect" class="form-select">
+            <option value="">未分类</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="editor-btn secondary" id="cancelEditFile">取消</button>
+        <button class="editor-btn" id="confirmEditFile">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 插入模态框 -->
+  <div class="modal" id="insertModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">插入内容</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="tab-container">
+          <div class="tab active" data-tab="image">图片</div>
+          <div class="tab" data-tab="video">视频</div>
+          <div class="tab" data-tab="file">文件</div>
+          <div class="tab" data-tab="other">其他</div>
+        </div>
+
+        <div class="tab-content active" id="imageTab">
+          <div class="form-group">
+            <label class="form-label">图片URL</label>
+            <input type="text" class="form-input" id="imageUrl" placeholder="输入图片URL">
+          </div>
+          <div class="form-group">
+            <label class="form-label">或上传图片</label>
+            <input type="file" class="form-input" id="imageUpload" accept="image/*">
+          </div>
+          <div class="form-group">
+            <label class="form-label">替代文本</label>
+            <input type="text" class="form-input" id="imageAlt" placeholder="图片描述">
+          </div>
+          <button class="editor-btn" id="insertImageBtn">插入图片</button>
+        </div>
+
+        <div class="tab-content" id="videoTab">
+          <div class="form-group">
+            <label class="form-label">视频URL</label>
+            <input type="text" class="form-input" id="videoUrl" placeholder="输入视频URL">
+          </div>
+          <div class="form-group">
+            <label class="form-label">视频平台</label>
+            <select class="form-select" id="videoPlatform">
+              <option value="youtube">YouTube</option>
+              <option value="vimeo">Vimeo</option>
+              <option value="custom">自定义</option>
+            </select>
+          </div>
+          <button class="editor-btn" id="insertVideoBtn">插入视频</button>
+        </div>
+
+        <div class="tab-content" id="fileTab">
+          <div class="form-group">
+            <label class="form-label">文件URL</label>
+            <input type="text" class="form-input" id="fileUrl" placeholder="输入文件URL">
+          </div>
+          <div class="form-group">
+            <label class="form-label">或上传文件</label>
+            <input type="file" class="form-input" id="fileUpload">
+          </div>
+          <div class="form-group">
+            <label class="form-label">链接文本</label>
+            <input type="text" class="form-input" id="fileText" placeholder="链接显示文本">
+          </div>
+          <button class="editor-btn" id="insertFileBtn">插入文件链接</button>
+        </div>
+
+        <div class="tab-content" id="otherTab">
+          <div class="form-group">
+            <label class="form-label">插入内容类型</label>
+            <select class="form-select" id="otherType">
+              <option value="table">表格</option>
+              <option value="code">代码块</option>
+              <option value="quote">引用</option>
+              <option value="divider">分隔线</option>
+            </select>
+          </div>
+          <button class="editor-btn" id="insertOtherBtn">插入</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 偏好设置模态框 -->
+  <div class="modal" id="prefModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">偏好设置</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="tab-container">
+          <div class="tab active" data-tab="theme">主题</div>
+          <div class="tab" data-tab="editor">编辑器</div>
+          <div class="tab" data-tab="importExport">配置导入/导出</div>
+          <div class="tab" data-tab="template">模板设置</div>
+          <div class="tab" data-tab="imageHost">图床</div>
+        </div>
+
+        <div class="tab-content active" id="themeTab">
+          <div class="form-group">
+            <label class="form-label">主题设置</label>
+            <div>
+              <input type="radio" id="lightTheme" name="theme" value="light" checked>
+              <label for="lightTheme">亮色主题</label>
+            </div>
+            <div>
+              <input type="radio" id="darkTheme" name="theme" value="dark">
+              <label for="darkTheme">暗色主题</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">编辑器字体大小</label>
+            <input type="range" min="12" max="24" value="16" class="form-input" id="fontSize">
+            <div id="fontSizeValue">16px</div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="editorTab">
+          <div class="form-group">
+            <label class="form-label">编辑器设置</label>
+            <div>
+              <input type="checkbox" id="lineNumbers" checked>
+              <label for="lineNumbers">显示行号</label>
+            </div>
+            <div>
+              <input type="checkbox" id="autoIndent" checked>
+              <label for="autoIndent">自动缩进</label>
+            </div>
+            <div>
+              <input type="checkbox" id="wordWrap" checked>
+              <label for="wordWrap">自动换行</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tab键宽度</label>
+            <input type="range" min="2" max="8" value="4" class="form-input" id="tabSize">
+            <div id="tabSizeValue">4个空格</div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="importExportTab">
+          <div class="form-group">
+            <label class="form-label">导入配置</label>
+            <input type="file" id="configImport" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">导出配置</label>
+            <button class="editor-btn secondary" id="exportConfigBtn">导出配置</button>
+          </div>
+        </div>
+
+        <div class="tab-content" id="templateTab">
+          <div class="form-group">
+            <label class="form-label">模板管理</label>
+            <div id="templateList"></div>
+            <button class="editor-btn secondary" id="addTemplateBtn">
+              <i class="fas fa-plus"></i> 添加模板
+            </button>
+          </div>
+          <div class="form-group">
+            <label class="form-label">模板内容</label>
+            <textarea class="form-textarea" id="templateContent" placeholder="输入模板内容..."></textarea>
+            <p class="form-hint">支持变量：<br />
+              {{date}} - 当前日期<br />
+              {{time}} - 当前时间<br />
+              {{datetime}} - 当前日期和时间<br />
+              {{filename}} - 文档名称<br />
+              {{year}} - 年<br />
+              {{month}} - 月<br />
+              {{day}} - 日<br />
+            </p>
+          </div>
+        </div>
+
+        <div class="tab-content" id="imageHostTab">
+          <div class="form-group">
+            <label class="form-label">图床配置</label>
+            <div class="image-host-list" id="imageHostList"></div>
+            <button class="editor-btn secondary" id="addImageHostBtn" style="margin-top: 10px;">
+              <i class="fas fa-plus"></i> 添加图床
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="editor-btn secondary" id="cancelPref">取消</button>
+        <button class="editor-btn" id="savePref">保存设置</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 历史版本模态框 -->
+  <div class="modal" id="historyModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">历史版本</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="tab-container">
+          <div class="tab active" data-tab="local">本地历史</div>
+          <div class="tab" data-tab="remote">远程仓库历史</div>
+        </div>
+
+        <div class="tab-content active" id="localTab">
+          <div class="form-group">
+            <label class="form-label">选择文件</label>
+            <select class="form-select" id="localHistoryFileSelect"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">历史版本</label>
+            <div id="localHistoryList"></div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="remoteTab">
+          <div class="form-group">
+            <label class="form-label">选择仓库</label>
+            <select class="form-select" id="remoteHistoryRepoSelect"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">历史版本</label>
+            <div id="remoteHistoryList"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="editor-btn secondary" id="closeHistory">关闭</button>
+        <button class="editor-btn" id="restoreVersion">恢复此版本</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 存储设置模态框 -->
+  <div class="modal" id="storageModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">存储设置</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="tab-container">
+          <div class="tab active" data-tab="local">本地存储</div>
+          <div class="tab" data-tab="git">Git存储</div>
+          <div class="tab" data-tab="multigit">多点Git存储</div>
+          <div class="tab" data-tab="webdav">WebDAV</div>
+        </div>
+
+        <div class="tab-content active" id="localTab">
+          <div class="form-group">
+            <label class="form-label">自动保存</label>
+            <div>
+              <input type="checkbox" id="autoSave" checked>
+              <label for="autoSave">启用自动保存</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">保存间隔（秒）</label>
+            <input type="number" min="5" max="300" value="30" class="form-input" id="saveInterval">
+          </div>
+        </div>
+
+        <div class="tab-content" id="gitTab">
+          <div class="form-group">
+            <label class="form-label">仓库URL</label>
+            <input type="text" class="form-input" id="gitRepoUrl" placeholder="https://github.com/user/repo.git">
+          </div>
+          <div class="form-group">
+            <label class="form-label">分支</label>
+            <input type="text" class="form-input" id="gitBranch" value="master">
+          </div>
+          <div class="form-group">
+            <label class="form-label">访问令牌</label>
+            <input type="password" class="form-input" id="gitToken" placeholder="输入访问令牌">
+          </div>
+          <div class="form-group">
+            <label class="form-label">自动同步</label>
+            <div>
+              <input type="checkbox" id="gitAutoSync" checked>
+              <label for="gitAutoSync">保存时自动同步</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="multigitTab">
+          <div class="form-group">
+            <label class="form-label">Git仓库配置</label>
+            <div class="repo-list" id="repoList"></div>
+            <button class="editor-btn secondary" id="addRepoBtn" style="width: auto;">
+              <i class="fas fa-plus"></i> 添加仓库
+            </button>
+          </div>
+          <div class="form-group">
+            <label class="form-label">自动同步</label>
+            <div>
+              <input type="checkbox" id="multiAutoSync" checked>
+              <label for="multiAutoSync">保存文件时自动同步</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="webdavTab">
+          <div class="form-group">
+            <label class="form-label">服务器URL</label>
+            <input type="text" class="form-input" id="webdavUrl" placeholder="https://example.com/dav">
+          </div>
+          <div class="form-group">
+            <label class="form-label">用户名</label>
+            <input type="text" class="form-input" id="webdavUser" placeholder="用户名">
+          </div>
+          <div class="form-group">
+            <label class="form-label">密码</label>
+            <input type="password" class="form-input" id="webdavPass" placeholder="密码">
+          </div>
+          <div class="form-group">
+            <label class="form-label">远程路径</label>
+            <input type="text" class="form-input" id="webdavPath" value="/markdown">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="editor-btn secondary" id="cancelStorage">取消</button>
+        <button class="editor-btn" id="saveStorage">保存设置</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提交信息模态框 -->
+  <div class="modal" id="commitModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">提交信息</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">提交信息</label>
+          <textarea id="commitMessage" class="form-textarea" placeholder="输入提交信息..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">仓库选择</label>
+          <select id="commitRepoSelect" class="form-select"></select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="editor-btn secondary" id="cancelCommit">取消</button>
+        <button class="editor-btn" id="confirmCommit">提交</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据导入导出模态框 -->
+  <div class="modal" id="dataModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">数据导入/导出</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="tab-container">
+          <div class="tab active" data-tab="import">导入数据</div>
+          <div class="tab" data-tab="export">导出数据</div>
+        </div>
+
+        <div class="tab-content active" id="importTab">
+          <div class="form-group">
+            <label class="form-label">选择导入方式</label>
+            <select class="form-select" id="importType">
+              <option value="file">从文件导入</option>
+              <option value="git">从Git仓库导入</option>
+              <option value="text">粘贴文本</option>
+              <option value="files">选择多个文件导入</option>
+              <option value="folder">从文件夹导入</option>
+              <option value="zip">从ZIP文件导入</option>
+              <option value="json">从JSON文件导入</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="fileImportSection">
+            <label class="form-label">选择Markdown文件</label>
+            <input type="file" id="fileInput" accept=".md,.markdown,.txt" class="form-input">
+          </div>
+
+          <div class="form-group" id="gitImportSection" style="display: none;">
+            <label class="form-label">Git仓库URL</label>
+            <input type="text" class="form-input" id="gitImportUrl" placeholder="https://github.com/user/repo.git">
+            <label class="form-label">分支</label>
+            <input type="text" class="form-input" id="gitImportBranch" placeholder="master">
+            <label class="form-label">文件路径</label>
+            <input type="text" class="form-input" id="gitImportPath" placeholder="path/to/file.md">
+          </div>
+
+          <div class="form-group" id="textImportSection" style="display: none;">
+            <label class="form-label">粘贴Markdown内容</label>
+            <textarea class="form-textarea" id="textImportContent" placeholder="粘贴Markdown内容..."></textarea>
+          </div>
+
+          <div class="form-group" id="filesImportSection" style="display: none;">
+            <label class="form-label">选择Markdown文件</label>
+            <input type="file" id="fileInput" accept=".md,.markdown,.txt" class="form-input" multiple>
+          </div>
+
+          <div class="form-group" id="folderImportSection" style="display: none;">
+            <label class="form-label">选择文件夹</label>
+            <input type="file" id="folderInput" webkitdirectory directory multiple class="form-input">
+          </div>
+
+          <div class="form-group" id="zipImportSection" style="display: none;">
+            <label class="form-label">选择ZIP文件</label>
+            <input type="file" id="zipInput" accept=".zip" class="form-input">
+          </div>
+
+          <div class="form-group" id="jsonImportSection" style="display: none;">
+            <label class="form-label">选择JSON文件</label>
+            <input type="file" id="jsonInput" accept=".json" class="form-input">
+          </div>
+        </div>
+
+        <div class="tab-content" id="exportTab">
+          <div class="form-group">
+            <label class="form-label">选择导出方式</label>
+            <select class="form-select" id="exportType">
+              <option value="single">导出当前文件</option>
+              <option value="batch">批量导出所有文件</option>
+              <option value="git">导出到Git仓库</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="singleExportSection">
+            <label class="form-label">文件名</label>
+            <input type="text" class="form-input" id="exportFileName" value="document.md">
+            <label class="form-label">格式</label>
+            <select class="form-select" id="exportFormat">
+              <option value="md">Markdown (.md)</option>
+              <option value="html">HTML (.html)</option>
+              <option value="pdf">PDF (.pdf)</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="batchExportSection" style="display: none;">
+            <label class="form-label">导出格式</label>
+            <select class="form-select" id="batchExportFormat">
+              <option value="zip">ZIP压缩包</option>
+              <option value="json">JSON格式</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="gitExportSection" style="display: none;">
+            <label class="form-label">目标仓库</label>
+            <select class="form-select" id="gitExportRepo">
+              <option value="primary">主仓库</option>
+            </select>
+            <label class="form-label">分支</label>
+            <input type="text" class="form-input" id="gitExportBranch" placeholder="master">
+            <label class="form-label">文件路径</label>
+            <input type="text" class="form-input" id="gitExportPath" placeholder="path/to/file.md">
+            <label class="form-label">提交信息</label>
+            <input type="text" class="form-input" id="gitExportMessage" placeholder="更新文档">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="editor-btn secondary" id="cancelData">取消</button>
+        <button class="editor-btn" id="confirmData">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 图床配置项模板 -->
+  <template id="imageHostItemTemplate">
+    <div class="image-host-item">
+      <button type="button" class="remove-image-host-btn" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--error-color); cursor: pointer;">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="default-image-host-select">
+        <input type="radio" name="defaultImageHost" class="default-image-host-radio" style="margin-right: 8px;">
+        <label style="font-weight: 500; color: var(--primary-color);">默认图床</label>
+      </div>
+      <div class="form-group">
+        <label class="form-label">图床名称</label>
+        <input type="text" class="form-input image-host-name" placeholder="输入图床名称">
+      </div>
+      <div class="form-group">
+        <label class="form-label">图床类型</label>
+        <select class="image-host-type form-select">
+          <option value="github">GitHub</option>
+          <option value="gitee">Gitee</option>
+          <option value="custom">自定义</option>
+        </select>
+      </div>
+      <div class="form-group github-config">
+        <label class="form-label">GitHub配置</label>
+        <input type="text" class="form-input github-username" placeholder="用户名">
+        <input type="text" class="form-input github-repo" placeholder="仓库名">
+        <input type="text" class="form-input github-branch" placeholder="分支" value="main">
+        <input type="text" class="form-input github-path" placeholder="目录路径" value="img">
+        <input type="password" class="form-input github-token" placeholder="访问令牌">
+        <input type="text" class="form-input github-customDomain" placeholder="自定义域名">
+      </div>
+      <div class="form-group gitee-config" style="display: none;">
+        <label class="form-label">Gitee配置</label>
+        <input type="text" class="form-input gitee-username" placeholder="用户名">
+        <input type="text" class="form-input gitee-repo" placeholder="仓库名">
+        <input type="text" class="form-input gitee-branch" placeholder="分支" value="master">
+        <input type="text" class="form-input gitee-path" placeholder="目录路径" value="img">
+        <input type="password" class="form-input gitee-token" placeholder="访问令牌">
+        <input type="text" class="form-input gitee-customDomain" placeholder="自定义域名">
+      </div>
+      <div class="form-group custom-config" style="display: none;">
+        <label class="form-label">自定义图床配置</label>
+        <input type="text" class="form-input custom-api-url" placeholder="API地址">
+        <input type="text" class="form-input custom-upload-path" placeholder="上传路径">
+        <input type="password" class="form-input custom-api-key" placeholder="API密钥">
+        <input type="text" class="form-input custom-customDomain" placeholder="自定义域名">
+      </div>
+    </div>
+  </template>
+
+  <!-- Git仓库配置项模板 -->
+  <template id="gitRepoItemTemplate">
+    <div class="git-repo-item">
+      <button type="button" class="remove-repo-btn" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--error-color); cursor: pointer;">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="primary-repo-select">
+        <input type="radio" name="primaryRepo" class="primary-repo-radio" style="margin-right: 8px;">
+        <label style="font-weight: 500; color: var(--primary-color);">主仓库</label>
+      </div>
+      <div class="form-group">
+        <label class="form-label">仓库名称</label>
+        <input type="text" class="repo-name form-input" placeholder="仓库描述">
+      </div>
+      <div class="form-group">
+        <label class="form-label">仓库类型</label>
+        <select class="repo-type form-select">
+          <option value="github">GitHub</option>
+          <option value="gitee">Gitee</option>
+          <option value="gitea">Gitea</option>
+          <option value="gitlab">GitLab</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">访问令牌</label>
+        <input type="password" class="repo-token form-input" placeholder="输入访问令牌">
+      </div>
+      <div class="form-group">
+        <label class="form-label">仓库路径</label>
+        <input type="text" class="repo-path form-input" placeholder="用户名/仓库名">
+      </div>
+      <div class="form-group">
+        <label class="form-label">分支</label>
+        <input type="text" class="repo-path form-input" placeholder="master" value="master">
+      </div>
+      <div class="form-group">
+        <label class="form-label">加密存储</label>
+        <select class="encrypt-option form-select">
+          <option value="yes" selected>是</option>
+          <option value="no">否</option>
+        </select>
+      </div>
+      <div class="form-group gitea-server" style="display: none;">
+        <label class="form-label">Gitea 服务器地址</label>
+        <input type="url" class="gitea-url form-input" placeholder="https://gitea.example.com">
+      </div>
+    </div>
+  </template>
+
+  <!-- 导入预览模板 -->
+  <div id="importPreview">
+    <h4>导入预览</h4>
+    <div id="previewContent"></div>
+  </div>
+
+  <!-- 导入主脚本 -->
+  <script type="module" src="./src/main.js"></script>
+</body>
+
+</html>

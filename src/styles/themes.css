@@ -1,0 +1,177 @@
+/* Theme Styles - 主题样式 */
+
+/* 暗色主题相关元素样式覆盖 */
+
+/* Header */
+body.dark-theme .header {
+  background-color: #252526;
+  color: var(--dark-text);
+}
+
+body.dark-theme .logo h1 {
+  color: var(--dark-text);
+}
+
+body.dark-theme .menu-item {
+  color: var(--dark-text);
+}
+
+body.dark-theme .menu-item:hover {
+  background-color: rgba(52, 152, 219, 0.2);
+}
+
+body.dark-theme .divider {
+  background-color: var(--dark-border);
+}
+
+/* Sidebar */
+body.dark-theme .sidebar {
+  background-color: #252526;
+}
+
+body.dark-theme .sidebar-header {
+  border-bottom-color: #444;
+}
+
+body.dark-theme .folder-item {
+  background-color: #2d2d2d;
+  border-color: #444;
+}
+
+body.dark-theme .uncategorized-header {
+  color: #aaa;
+  border-bottom-color: #444;
+}
+
+body.dark-theme .folder-contents {
+  background-color: #2d2d2d;
+  border-top-color: #444;
+}
+
+body.dark-theme .folder-contents .file-item {
+  background-color: #333;
+}
+
+/* Editor Container */
+body.dark-theme .editor-container {
+  background-color: #1e1e1e;
+}
+
+body.dark-theme .editor-header {
+  border-bottom-color: #444;
+}
+
+body.dark-theme .editor-title {
+  color: var(--dark-text);
+}
+
+/* Status Bar */
+body.dark-theme .status-bar {
+  background-color: #252526;
+  border-top-color: #444;
+  color: #aaa;
+}
+
+/* Modal */
+body.dark-theme .modal-content {
+  background-color: #252526;
+  color: var(--dark-text);
+}
+
+body.dark-theme .modal-header {
+  background-color: #2d2d2d;
+  border-bottom-color: #444;
+}
+
+body.dark-theme .modal-title {
+  color: var(--dark-text);
+}
+
+body.dark-theme .modal-close {
+  color: #aaa;
+}
+
+body.dark-theme .modal-body {
+  background-color: #1e1e1e;
+}
+
+body.dark-theme .modal-footer {
+  background-color: #2d2d2d;
+  border-top-color: #444;
+}
+
+/* Form Elements */
+body.dark-theme .form-label {
+  color: var(--dark-text);
+}
+
+body.dark-theme .form-input,
+body.dark-theme .form-select,
+body.dark-theme .form-textarea {
+  background-color: #333;
+  border-color: #444;
+  color: var(--dark-text);
+}
+
+body.dark-theme .tab-container {
+  border-bottom-color: #444;
+}
+
+/* Image Host Items */
+body.dark-theme .image-host-item {
+  background-color: #333;
+}
+
+body.dark-theme .image-host-type {
+  background-color: #333;
+}
+
+/* Git Repo Items */
+body.dark-theme .git-repo-item {
+  background-color: #333;
+}
+
+/* Repo Items */
+body.dark-theme .repo-item {
+  background-color: #333;
+  border-color: #444;
+}
+
+body.dark-theme .repo-action-btn {
+  color: #aaa;
+}
+
+/* Folder Add Dialog */
+body.dark-theme .folder-add-dialog .dialog-content {
+  background-color: #252526;
+  color: var(--dark-text);
+}
+
+body.dark-theme .folder-add-dialog .file-option {
+  border-bottom-color: #444;
+}
+
+/* Editor Button Secondary */
+body.dark-theme .editor-btn.secondary {
+  background-color: #444;
+  color: var(--dark-text);
+}
+
+body.dark-theme .editor-btn.secondary:hover {
+  background-color: #555;
+}
+
+/* Context Menu */
+body.dark-theme #imageContextMenu {
+  background-color: #252526;
+  border-color: #444;
+}
+
+body.dark-theme #imageContextMenu > div:hover {
+  background-color: #333;
+}
+
+/* Login Container */
+body.dark-theme #login-container {
+  background-color: white;
+}

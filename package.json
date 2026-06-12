@@ -1,0 +1,14 @@
+{
+  "name": "ma-markdown-editor",
+  "version": "1.0.0",
+  "description": "Markdown加密编辑器 - 现代化重构版本",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

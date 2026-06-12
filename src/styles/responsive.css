@@ -1,0 +1,144 @@
+/* Responsive Styles - 响应式样式 */
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  /* 侧边栏 */
+  .sidebar {
+    position: absolute;
+    left: 0;
+    top: 60px;
+    bottom: 0;
+    z-index: 5;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .toggle-btn {
+    display: block;
+  }
+
+  /* 菜单栏 */
+  .menu-bar {
+    gap: 8px;
+  }
+
+  .menu-item {
+    padding: 6px 8px;
+    font-size: 14px;
+  }
+
+  .menu-item span {
+    display: none;
+  }
+
+  .menu-item i {
+    margin-right: 0;
+    font-size: 18px;
+  }
+
+  /* 编辑器按钮 */
+  .editor-btn span {
+    display: none;
+  }
+
+  .editor-btn i {
+    margin-right: 0;
+  }
+
+  /* 分屏模式改为上下布局 */
+  .split-view {
+    flex-direction: column;
+  }
+
+  .split-view .editor-mode {
+    width: 100%;
+    height: 50%;
+  }
+
+  /* 图片设置项 */
+  .image-host-item {
+    padding: 10px;
+  }
+
+  .form-group {
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 登录页面 */
+  .login-container {
+    padding: 25px 20px;
+    max-width: 100%;
+  }
+
+  .login-logo i {
+    font-size: 42px;
+  }
+
+  .login-title {
+    font-size: 20px;
+  }
+
+  .login-subtitle {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  .form-input {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .login-btn {
+    padding: 10px;
+    font-size: 15px;
+  }
+
+  .theme-toggle {
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+  }
+
+  /* Logo */
+  .logo h1 {
+    font-size: 18px;
+  }
+
+  /* 编辑器标题 */
+  .editor-title {
+    font-size: 14px;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* 状态栏 */
+  .status-bar {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 350px) {
+  .login-container {
+    padding: 20px 15px;
+  }
+
+  .login-logo i {
+    font-size: 36px;
+  }
+
+  .login-title {
+    font-size: 18px;
+  }
+
+  .login-subtitle {
+    font-size: 12px;
+  }
+}

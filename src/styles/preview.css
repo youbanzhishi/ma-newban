@@ -1,0 +1,128 @@
+/* Preview Styles - 预览区样式 */
+
+#preview {
+  padding: 20px;
+  line-height: 1.6;
+}
+
+.dark-theme #preview {
+  color: var(--dark-text);
+}
+
+/* Markdown渲染样式 */
+#preview h1,
+#preview h2,
+#preview h3 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+#preview h1 {
+  font-size: 2em;
+  border-bottom: 1px solid #eaecef;
+  padding-bottom: 0.3em;
+}
+
+.dark-theme #preview h1 {
+  border-bottom-color: #444;
+}
+
+#preview h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid #eaecef;
+  padding-bottom: 0.3em;
+}
+
+.dark-theme #preview h2 {
+  border-bottom-color: #444;
+}
+
+#preview p {
+  margin-bottom: 16px;
+}
+
+#preview a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+#preview a:hover {
+  text-decoration: underline;
+}
+
+#preview code {
+  background-color: rgba(27, 31, 35, 0.05);
+  border-radius: 3px;
+  padding: 0.2em 0.4em;
+  font-family: monospace;
+}
+
+.dark-theme #preview code {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#preview pre {
+  background-color: #f6f8fa;
+  border-radius: 6px;
+  padding: 16px;
+  overflow: auto;
+  margin-bottom: 16px;
+}
+
+.dark-theme #preview pre {
+  background-color: #2d2d2d;
+}
+
+#preview blockquote {
+  padding: 0 1em;
+  color: #6a737d;
+  border-left: 0.25em solid #dfe2e5;
+  margin: 0 0 16px 0;
+}
+
+.dark-theme #preview blockquote {
+  color: #aaa;
+  border-left-color: #555;
+}
+
+#preview ul,
+#preview ol {
+  margin-bottom: 16px;
+  padding-left: 2em;
+}
+
+#preview li {
+  margin-bottom: 0.5em;
+}
+
+#preview table {
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+#preview th,
+#preview td {
+  border: 1px solid #dfe2e5;
+  padding: 6px 13px;
+}
+
+.dark-theme #preview th,
+.dark-theme #preview td {
+  border-color: #444;
+}
+
+#preview th {
+  background-color: #f6f8fa;
+  font-weight: 600;
+}
+
+.dark-theme #preview th {
+  background-color: #333;
+}
+
+#preview img {
+  max-width: 100%;
+}
